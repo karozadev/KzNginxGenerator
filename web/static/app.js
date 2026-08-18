@@ -476,3 +476,45 @@ async function loadVersion() {
 renderApp();
 generate();
 loadVersion();
+
+
+function downloadConfig() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = "nginx-config.json";
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+async function importConfig(file) {
+  try {
+    const config = JSON.parse(await file.text());
+    if (!config || !Array.isArray(config.servers) || !Array.isArray(config.upstreams) || !Array.isArray(config.rateLimitZones)) {
+      throw new Error("invalid KzNginxGenerator configuration");
+    }
+    state.servers = config.servers;
+    state.upstreams = config.upstreams;
+    state.rateLimitZones = config.rateLimitZones;
+    renderApp();
+    scheduleGenerate();
+  } catch (error) {
+    alert("Import failed: " + error.message);
+  }
+}
+
+const configControls = document.createElement("div");
+const exportButton = document.createElement("button");
+const importInput = document.createElement("input");
+exportButton.type = "button";
+exportButton.textContent = "Exporter JSON";
+importInput.type = "file";
+importInput.accept = "application/json";
+exportButton.addEventListener("click", downloadConfig);
+importInput.addEventListener("change", async () => {
+  if (importInput.files.length) await importConfig(importInput.files[0]);
+  importInput.value = "";
+});
+configControls.append(exportButton, importInput);
+document.querySelector("header .max-w-7xl").append(configControls);
