@@ -11,8 +11,8 @@ var uiPort int
 
 var uiCmd = &cobra.Command{
 	Use:   "ui",
-	Short: "Lance l’interface web locale de KzNginxGenerator",
-	Long: `Démarre un serveur HTTP local servant l’interface web de
+	Short: "Lance l'interface web locale de KzNginxGenerator",
+	Long: `Démarre un serveur HTTP local servant l'interface web de
 KzNginxGenerator : construction visuelle de la configuration
 (upstreams, locations, SSL, ...) avec génération et aperçu en temps réel.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -26,6 +26,6 @@ KzNginxGenerator : construction visuelle de la configuration
 }
 
 func init() {
-	uiCmd.Flags().IntVar(&uiPort, "port", 8080, "port d’écoute du serveur web")
+	uiCmd.Flags().IntVar(&uiPort, "port", 8080, "port d'écoute du serveur web")
 	rootCmd.AddCommand(uiCmd)
 }
