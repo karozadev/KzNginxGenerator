@@ -46,7 +46,9 @@ main() {
   arch=$(detect_arch)
 
   log "Fetching latest release information for ${REPO}..."
-  latest_tag=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
+  release_json=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest") \
+    || err "failed to reach the GitHub Releases API for ${REPO}"
+  latest_tag=$(printf '%s' "$release_json" \
     | grep -m1 '"tag_name"' \
     | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/')
 
