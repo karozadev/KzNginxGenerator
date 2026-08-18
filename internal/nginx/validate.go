@@ -117,7 +117,13 @@ func (l Location) Validate() error {
 		if !l.FastCGI.Enabled {
 			errs = append(errs, errors.New("fastcgiCache: fastcgi must be enabled to use fastcgi caching"))
 		}
-		if l.FastCGICache.ZoneName == "" {
+		if l.FastCGICache.ZonePath == "" {
+		errs = append(errs, errors.New("fastcgiCache: zone path is required when cache is enabled"))
+	}
+	if l.FastCGICache.ZoneSize == "" {
+		errs = append(errs, errors.New("fastcgiCache: zone size is required when cache is enabled"))
+	}
+	if l.FastCGICache.ZoneName == "" {
 			errs = append(errs, errors.New("fastcgiCache: zone name is required when cache is enabled"))
 		}
 	}
