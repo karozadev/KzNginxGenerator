@@ -22,9 +22,7 @@ jobs:
           cache: true
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
+        run: go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest run ./...
 
   test:
     name: Test
@@ -71,4 +69,4 @@ jobs:
           cache: true
 
       - name: Build
-        run: go build -o kznginx ./...
+        run: go build -o kznginx .
