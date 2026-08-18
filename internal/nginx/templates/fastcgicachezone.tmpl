@@ -1,0 +1,1 @@
+fastcgi_cache_path {{ .ZonePath }} levels=1:2 keys_zone={{ .ZoneName }}:{{ .ZoneSize }}{{ if .MaxSize }} max_size={{ .MaxSize }}{{ end }}{{ if .InactiveTime }} inactive={{ .InactiveTime }}{{ end }};

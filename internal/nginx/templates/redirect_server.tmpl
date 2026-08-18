@@ -1,0 +1,7 @@
+server {
+    listen 80;
+{{- if .ServerNames }}
+    server_name {{ join .ServerNames " " }};
+{{- end }}
+    return 301 https://$host$request_uri;
+}

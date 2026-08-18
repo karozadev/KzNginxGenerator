@@ -1,0 +1,80 @@
+server {
+{{- range listenLines . }}
+    listen {{ . }};
+{{- end }}
+{{- if .HTTP2 }}
+    http2 on;
+{{- end }}
+{{- if .HTTP3 }}
+    listen 443 quic reuseport;
+    http3 on;
+    quic_retry on;
+    add_header Alt-Svc 'h3=":443"; ma=86400' always;
+{{- end }}
+{{- if .ServerNames }}
+    server_name {{ join .ServerNames " " }};
+{{- end }}
+{{- if .Root }}
+    root {{ .Root }};
+{{- end }}
+{{- if .Index }}
+    index {{ join .Index " " }};
+{{- end }}
+{{- if .AccessLog }}
+    access_log {{ .AccessLog }};
+{{- end }}
+{{- if .ErrorLog }}
+    error_log {{ .ErrorLog }};
+{{- end }}
+{{- if .SSL.Enabled }}
+    ssl_certificate {{ .SSL.CertificatePath }};
+    ssl_certificate_key {{ .SSL.CertificateKeyPath }};
+{{- if .SSL.Protocols }}
+    ssl_protocols {{ join .SSL.Protocols " " }};
+{{- end }}
+{{- if .SSL.Ciphers }}
+    ssl_ciphers {{ .SSL.Ciphers }};
+{{- end }}
+{{- if .SSL.PreferServerCiphers }}
+    ssl_prefer_server_ciphers on;
+{{- end }}
+{{- if .SSL.SessionCache }}
+    ssl_session_cache {{ .SSL.SessionCache }};
+{{- end }}
+{{- if .SSL.SessionTimeout }}
+    ssl_session_timeout {{ .SSL.SessionTimeout }};
+{{- end }}
+{{- if .SSL.OCSPStapling }}
+    ssl_stapling on;
+    ssl_stapling_verify on;
+{{- end }}
+{{- if .SSL.HSTS }}
+    add_header Strict-Transport-Security "max-age={{ hstsMaxAge .SSL }}{{ if .SSL.HSTSIncludeSubDomains }}; includeSubDomains{{ end }}{{ if .SSL.HSTSPreload }}; preload{{ end }}" always;
+{{- end }}
+{{- end }}
+{{- if .SecurityHeaders.XFrameOptions }}
+    add_header X-Frame-Options "{{ .SecurityHeaders.XFrameOptions }}" always;
+{{- end }}
+{{- if .SecurityHeaders.ContentSecurityPolicy }}
+    add_header Content-Security-Policy "{{ .SecurityHeaders.ContentSecurityPolicy }}" always;
+{{- end }}
+{{- if .SecurityHeaders.XContentTypeOptionsNoSniff }}
+    add_header X-Content-Type-Options "nosniff" always;
+{{- end }}
+{{- if .SecurityHeaders.ReferrerPolicy }}
+    add_header Referrer-Policy "{{ .SecurityHeaders.ReferrerPolicy }}" always;
+{{- end }}
+{{- if .SecurityHeaders.XSSProtection }}
+    add_header X-XSS-Protection "{{ .SecurityHeaders.XSSProtection }}" always;
+{{- end }}
+{{- if .SecurityHeaders.PermissionsPolicy }}
+    add_header Permissions-Policy "{{ .SecurityHeaders.PermissionsPolicy }}" always;
+{{- end }}
+{{- range .CustomDirectives }}
+    {{ . }}
+{{- end }}
+{{- range .Locations }}
+
+{{ template "location.tmpl" . }}
+{{- end }}
+}

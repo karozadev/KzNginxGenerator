@@ -1,0 +1,64 @@
+    location {{ .Path }} {
+{{- if .Alias }}
+        alias {{ .Alias }};
+{{- else if .Root }}
+        root {{ .Root }};
+{{- end }}
+{{- if .Index }}
+        index {{ join .Index " " }};
+{{- end }}
+{{- if .TryFiles }}
+        try_files {{ join .TryFiles " " }};
+{{- end }}
+{{- if .ReturnCode }}
+        return {{ .ReturnCode }}{{ if .ReturnValue }} {{ .ReturnValue }}{{ end }};
+{{- end }}
+{{- if .ProxyPass }}
+        proxy_pass {{ .ProxyPass }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+{{- if .WebSocket.Enabled }}
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+{{- end }}
+{{- range $key, $value := .ProxySetHeaders }}
+        proxy_set_header {{ $key }} {{ $value }};
+{{- end }}
+{{- end }}
+{{- if .FastCGI.Enabled }}
+        fastcgi_pass {{ .FastCGI.Pass }};
+        fastcgi_index {{ if .FastCGI.Index }}{{ .FastCGI.Index }}{{ else }}index.php{{ end }};
+        include fastcgi_params;
+{{- if .FastCGI.SplitPathInfo }}
+        fastcgi_split_path_info {{ .FastCGI.SplitPathInfo }};
+{{- end }}
+        fastcgi_param SCRIPT_FILENAME {{ if .FastCGI.ScriptFilenameRoot }}{{ .FastCGI.ScriptFilenameRoot }}{{ else }}{{ .Root }}{{ end }}$fastcgi_script_name;
+{{- range $key, $value := .FastCGI.Params }}
+        fastcgi_param {{ $key }} {{ $value }};
+{{- end }}
+{{- if .FastCGICache.Enabled }}
+        fastcgi_cache {{ .FastCGICache.ZoneName }};
+{{- range $code, $duration := .FastCGICache.ValidCodes }}
+        fastcgi_cache_valid {{ $code }} {{ $duration }};
+{{- end }}
+{{- if .FastCGICache.UseStale }}
+        fastcgi_cache_use_stale {{ join .FastCGICache.UseStale " " }};
+{{- end }}
+{{- range .FastCGICache.Bypass }}
+        fastcgi_cache_bypass {{ . }};
+{{- end }}
+{{- range .FastCGICache.SkipIf }}
+        fastcgi_no_cache {{ . }};
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if .RateLimit.Enabled }}
+        limit_req zone={{ .RateLimit.Zone }}{{ if .RateLimit.Burst }} burst={{ .RateLimit.Burst }}{{ end }}{{ if .RateLimit.Nodelay }} nodelay{{ end }};
+{{- end }}
+{{- range .CustomDirectives }}
+        {{ . }}
+{{- end }}
+    }

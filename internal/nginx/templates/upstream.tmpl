@@ -1,0 +1,14 @@
+upstream {{ .Name }} {
+{{- if lbDirective .Method }}
+    {{ lbDirective .Method }};
+{{- end }}
+{{- range .Servers }}
+    server {{ .Address }}{{ if .Weight }} weight={{ .Weight }}{{ end }}{{ if .MaxFails }} max_fails={{ .MaxFails }}{{ end }}{{ if .FailTimeout }} fail_timeout={{ .FailTimeout }}{{ end }}{{ if .Backup }} backup{{ end }}{{ if .Down }} down{{ end }};
+{{- end }}
+{{- if .KeepAlive }}
+    keepalive {{ .KeepAlive }};
+{{- end }}
+{{- range .CustomDirectives }}
+    {{ . }}
+{{- end }}
+}
