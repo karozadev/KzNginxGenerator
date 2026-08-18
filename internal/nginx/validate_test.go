@@ -161,3 +161,15 @@ func TestLocationValidate(t *testing.T) {
 		})
 	}
 }
+
+
+func TestLocationValidate_FastCGICacheRequiresZoneDefinition(t *testing.T) {
+	loc := Location{
+		Path: "/",
+		FastCGI: FastCGI{Enabled: true, Pass: "127.0.0.1:9000"},
+		FastCGICache: FastCGICache{Enabled: true, ZoneName: "cache"},
+	}
+	if err := loc.Validate(); err == nil {
+		t.Fatal("expected error for cache without zone path and size, got nil")
+	}
+}
