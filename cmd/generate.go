@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/karoza/kz-nginx-generator/internal/nginx"
+	"github.com/karozadev/KzNginxGenerator/internal/nginx"
 	"github.com/spf13/cobra"
 )
 

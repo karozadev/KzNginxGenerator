@@ -7,7 +7,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/karoza/kz-nginx-generator/web"
+	"github.com/karozadev/KzNginxGenerator/web"
 )
 
 // Options configures the HTTP server.

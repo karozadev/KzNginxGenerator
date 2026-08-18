@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/karoza/kz-nginx-generator/internal/nginx"
+	"github.com/karozadev/KzNginxGenerator/internal/nginx"
 )
 
 func testMux() http.Handler {

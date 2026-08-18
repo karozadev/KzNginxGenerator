@@ -52,7 +52,7 @@ release:
 dockers:
   - id: kznginx-amd64
     image_templates:
-      - "ghcr.io/karoza/kz-nginx-generator:{{ .Version }}-amd64"
+      - "ghcr.io/karozadev/kznginxgenerator:{{ .Version }}-amd64"
     dockerfile: Dockerfile
     use: buildx
     goarch: amd64
@@ -60,7 +60,7 @@ dockers:
       - "--platform=linux/amd64"
   - id: kznginx-arm64
     image_templates:
-      - "ghcr.io/karoza/kz-nginx-generator:{{ .Version }}-arm64"
+      - "ghcr.io/karozadev/kznginxgenerator:{{ .Version }}-arm64"
     dockerfile: Dockerfile
     use: buildx
     goarch: arm64
@@ -68,12 +68,12 @@ dockers:
       - "--platform=linux/arm64"
 
 docker_manifests:
-  - name_template: "ghcr.io/karoza/kz-nginx-generator:{{ .Version }}"
+  - name_template: "ghcr.io/karozadev/kznginxgenerator:{{ .Version }}"
     image_templates:
-      - "ghcr.io/karoza/kz-nginx-generator:{{ .Version }}-amd64"
-      - "ghcr.io/karoza/kz-nginx-generator:{{ .Version }}-arm64"
-  - name_template: "ghcr.io/karoza/kz-nginx-generator:latest"
+      - "ghcr.io/karozadev/kznginxgenerator:{{ .Version }}-amd64"
+      - "ghcr.io/karozadev/kznginxgenerator:{{ .Version }}-arm64"
+  - name_template: "ghcr.io/karozadev/kznginxgenerator:latest"
     image_templates:
-      - "ghcr.io/karoza/kz-nginx-generator:{{ .Version }}-amd64"
-      - "ghcr.io/karoza/kz-nginx-generator:{{ .Version }}-arm64"
+      - "ghcr.io/karozadev/kznginxgenerator:{{ .Version }}-amd64"
+      - "ghcr.io/karozadev/kznginxgenerator:{{ .Version }}-arm64"
     skip_push: auto

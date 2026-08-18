@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/karoza/kz-nginx-generator/cmd"
+	"github.com/karozadev/KzNginxGenerator/cmd"
 )
 
 // Version is the kznginx release version, e.g. "v1.0.0" or

@@ -5,11 +5,11 @@ du simple reverse proxy aux architectures complexes (load balancing, SSL/TLS,
 FastCGI, cache, rate limiting), via une interface web locale ou en ligne de
 commande.
 
-[![CI](https://github.com/karoza/kz-nginx-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/karoza/kz-nginx-generator/actions/workflows/ci.yml)
-[![Release](https://github.com/karoza/kz-nginx-generator/actions/workflows/release.yml/badge.svg)](https://github.com/karoza/kz-nginx-generator/actions/workflows/release.yml)
-[![Coverage](https://codecov.io/gh/karoza/kz-nginx-generator/branch/main/graph/badge.svg)](https://codecov.io/gh/karoza/kz-nginx-generator)
-[![Latest Release](https://img.shields.io/github/v/release/karoza/kz-nginx-generator?include_prereleases&sort=semver)](https://github.com/karoza/kz-nginx-generator/releases)
-[![Go Report Card](https://goreportcard.com/badge/github.com/karoza/kz-nginx-generator)](https://goreportcard.com/report/github.com/karoza/kz-nginx-generator)
+[![CI](https://github.com/karozadev/KzNginxGenerator/actions/workflows/ci.yml/badge.svg)](https://github.com/karozadev/KzNginxGenerator/actions/workflows/ci.yml)
+[![Release](https://github.com/karozadev/KzNginxGenerator/actions/workflows/release.yml/badge.svg)](https://github.com/karozadev/KzNginxGenerator/actions/workflows/release.yml)
+[![Coverage](https://codecov.io/gh/karozadev/KzNginxGenerator/branch/main/graph/badge.svg)](https://codecov.io/gh/karozadev/KzNginxGenerator)
+[![Latest Release](https://img.shields.io/github/v/release/karozadev/KzNginxGenerator?include_prereleases&sort=semver)](https://github.com/karozadev/KzNginxGenerator/releases)
+[![Go Report Card](https://goreportcard.com/badge/github.com/karozadev/KzNginxGenerator)](https://goreportcard.com/report/github.com/karozadev/KzNginxGenerator)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
@@ -58,7 +58,7 @@ web locale (pour construire visuellement des configurations complexes).
 ### Installation rapide (Linux / macOS)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/karoza/kz-nginx-generator/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/karozadev/KzNginxGenerator/main/install.sh | sh
 ```
 
 Le script détecte automatiquement votre OS et votre architecture, télécharge
@@ -68,14 +68,14 @@ le dernier binaire stable depuis les GitHub Releases et l'installe dans
 ### Via `go install`
 
 ```bash
-go install github.com/karoza/kz-nginx-generator@latest
+go install github.com/karozadev/KzNginxGenerator@latest
 ```
 
 ### Depuis les sources
 
 ```bash
-git clone https://github.com/karoza/kz-nginx-generator.git
-cd kz-nginx-generator
+git clone https://github.com/karozadev/KzNginxGenerator.git
+cd KzNginxGenerator
 make build
 ./bin/kznginx version
 ```
@@ -83,7 +83,7 @@ make build
 ### Docker
 
 ```bash
-docker run --rm -p 8080:8080 ghcr.io/karoza/kz-nginx-generator:latest ui --port 8080
+docker run --rm -p 8080:8080 ghcr.io/karozadev/kznginxgenerator:latest ui --port 8080
 ```
 
 ## Utilisation en ligne de commande
@@ -181,8 +181,8 @@ output, err := nginx.Render(cfg)
 Prérequis : [Go 1.23+](https://go.dev/dl/).
 
 ```bash
-git clone https://github.com/karoza/kz-nginx-generator.git
-cd kz-nginx-generator
+git clone https://github.com/karozadev/KzNginxGenerator.git
+cd KzNginxGenerator
 
 make test        # tests unitaires + couverture
 make lint        # golangci-lint

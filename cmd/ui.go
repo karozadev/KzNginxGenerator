@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/karoza/kz-nginx-generator/internal/server"
+	"github.com/karozadev/KzNginxGenerator/internal/server"
 	"github.com/spf13/cobra"
 )
 

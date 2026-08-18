@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/karoza/kz-nginx-generator/internal/nginx"
+	"github.com/karozadev/KzNginxGenerator/internal/nginx"
 )
 
 type generateResponse struct {

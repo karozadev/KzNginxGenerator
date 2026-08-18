@@ -1,4 +1,4 @@
-module github.com/karoza/kz-nginx-generator
+module github.com/karozadev/KzNginxGenerator
 
 go 1.23
 

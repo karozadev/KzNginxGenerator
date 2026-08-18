@@ -2,13 +2,13 @@
 # install.sh — one-liner installer for KzNginxGenerator (kznginx).
 #
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/karoza/kz-nginx-generator/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/karozadev/KzNginxGenerator/main/install.sh | sh
 #
 # Detects OS/arch, downloads the latest stable release binary from
 # GitHub Releases, and installs it to /usr/local/bin/kznginx.
 set -eu
 
-REPO="karoza/kz-nginx-generator"
+REPO="karozadev/KzNginxGenerator"
 BIN_NAME="kznginx"
 INSTALL_DIR="${INSTALL_DIR:-/usr/local/bin}"
 
