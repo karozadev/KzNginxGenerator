@@ -161,3 +161,10 @@ func TestLocationValidate(t *testing.T) {
 		})
 	}
 }
+
+func TestServerValidate_HTTP2RequiresSSL(t *testing.T) {
+	srv := Server{ServerNames: []string{"example.com"}, HTTP2: true}
+	if err := srv.Validate(); err == nil {
+		t.Fatal("expected error for HTTP/2 without SSL, got nil")
+	}
+}

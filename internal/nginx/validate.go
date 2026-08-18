@@ -93,6 +93,9 @@ func (s Server) Validate() error {
 			errs = append(errs, errors.New("ssl: certificate key path is required when ssl is enabled"))
 		}
 	}
+	if s.HTTP2 && !s.SSL.Enabled {
+		errs = append(errs, errors.New("http2 requires ssl to be enabled"))
+	}
 	if s.HTTP3 && !s.SSL.Enabled {
 		errs = append(errs, errors.New("http3 requires ssl to be enabled"))
 	}
