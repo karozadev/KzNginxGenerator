@@ -1,7 +1,6 @@
 package nginx
 
 import (
-	
 	"errors"
 	"fmt"
 )
@@ -99,10 +98,7 @@ func (s Server) Validate() error {
 	}
 	if s.HTTP3 && !s.SSL.Enabled {
 		errs = append(errs, errors.New("http3 requires ssl to be enabled"))
-
-		
 	}
-	
 	for i, loc := range s.Locations {
 		if err := loc.Validate(); err != nil {
 			errs = append(errs, fmt.Errorf("location[%d] %q: %w", i, loc.Path, err))
