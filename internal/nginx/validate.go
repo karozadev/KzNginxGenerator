@@ -3,7 +3,40 @@ package nginx
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
+
+// unsafeChars lists characters that could break out of a quoted or
+// single-line Nginx directive argument (a stray '"' closes a quoted
+// string early, e.g. in `add_header X "..." always;`; a newline starts
+// a new directive even without quotes). Checked wherever a value is
+// rendered as a single directive argument.
+//
+// Fields meant to hold raw Nginx syntax (CustomDirectives, ProxyPass,
+// rate-limit zone refs, ...) are excluded: they're a documented escape
+// hatch for arbitrary directives, so ';'/'{'/'}' are expected there.
+var unsafeChars = []string{"\"", "\n", "\r"}
+
+// containsUnsafeChars reports whether s contains a character that could
+// break out of a quoted or single-line Nginx directive argument.
+func containsUnsafeChars(s string) bool {
+	for _, c := range unsafeChars {
+		if strings.Contains(s, c) {
+			return true
+		}
+	}
+	return false
+}
+
+// checkSafe returns an error if s contains characters unsafe to
+// interpolate into a single Nginx directive argument, wrapping the
+// field name for context.
+func checkSafe(field, s string) error {
+	if containsUnsafeChars(s) {
+		return fmt.Errorf("%s: value must not contain quotes or newlines", field)
+	}
+	return nil
+}
 
 // Validate checks the Config for structural and semantic errors that
 // would prevent generating a valid Nginx configuration. It returns a
@@ -75,6 +108,12 @@ func (u Upstream) Validate() error {
 		if s.Address == "" {
 			errs = append(errs, fmt.Errorf("server[%d]: address is required", i))
 		}
+		if err := checkSafe(fmt.Sprintf("server[%d].address", i), s.Address); err != nil {
+			errs = append(errs, err)
+		}
+		if err := checkSafe(fmt.Sprintf("server[%d].failTimeout", i), s.FailTimeout); err != nil {
+			errs = append(errs, err)
+		}
 	}
 	return errors.Join(errs...)
 }
@@ -85,12 +124,42 @@ func (s Server) Validate() error {
 	if len(s.ServerNames) == 0 {
 		errs = append(errs, errors.New("at least one server name is required"))
 	}
+	for i, name := range s.ServerNames {
+		if err := checkSafe(fmt.Sprintf("serverNames[%d]", i), name); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	if err := checkSafe("root", s.Root); err != nil {
+		errs = append(errs, err)
+	}
+	if err := checkSafe("accessLog", s.AccessLog); err != nil {
+		errs = append(errs, err)
+	}
+	if err := checkSafe("errorLog", s.ErrorLog); err != nil {
+		errs = append(errs, err)
+	}
+
 	if s.SSL.Enabled {
 		if s.SSL.CertificatePath == "" {
 			errs = append(errs, errors.New("ssl: certificate path is required when ssl is enabled"))
 		}
 		if s.SSL.CertificateKeyPath == "" {
 			errs = append(errs, errors.New("ssl: certificate key path is required when ssl is enabled"))
+		}
+		if err := checkSafe("ssl.certificatePath", s.SSL.CertificatePath); err != nil {
+			errs = append(errs, err)
+		}
+		if err := checkSafe("ssl.certificateKeyPath", s.SSL.CertificateKeyPath); err != nil {
+			errs = append(errs, err)
+		}
+		if err := checkSafe("ssl.ciphers", s.SSL.Ciphers); err != nil {
+			errs = append(errs, err)
+		}
+		if err := checkSafe("ssl.sessionCache", s.SSL.SessionCache); err != nil {
+			errs = append(errs, err)
+		}
+		if err := checkSafe("ssl.sessionTimeout", s.SSL.SessionTimeout); err != nil {
+			errs = append(errs, err)
 		}
 	}
 	if s.HTTP2 && !s.SSL.Enabled {
@@ -99,6 +168,23 @@ func (s Server) Validate() error {
 	if s.HTTP3 && !s.SSL.Enabled {
 		errs = append(errs, errors.New("http3 requires ssl to be enabled"))
 	}
+
+	if err := checkSafe("securityHeaders.xFrameOptions", s.SecurityHeaders.XFrameOptions); err != nil {
+		errs = append(errs, err)
+	}
+	if err := checkSafe("securityHeaders.contentSecurityPolicy", s.SecurityHeaders.ContentSecurityPolicy); err != nil {
+		errs = append(errs, err)
+	}
+	if err := checkSafe("securityHeaders.referrerPolicy", s.SecurityHeaders.ReferrerPolicy); err != nil {
+		errs = append(errs, err)
+	}
+	if err := checkSafe("securityHeaders.xssProtection", s.SecurityHeaders.XSSProtection); err != nil {
+		errs = append(errs, err)
+	}
+	if err := checkSafe("securityHeaders.permissionsPolicy", s.SecurityHeaders.PermissionsPolicy); err != nil {
+		errs = append(errs, err)
+	}
+
 	for i, loc := range s.Locations {
 		if err := loc.Validate(); err != nil {
 			errs = append(errs, fmt.Errorf("location[%d] %q: %w", i, loc.Path, err))
@@ -113,9 +199,39 @@ func (l Location) Validate() error {
 	if l.Path == "" {
 		errs = append(errs, errors.New("path is required"))
 	}
+	if err := checkSafe("root", l.Root); err != nil {
+		errs = append(errs, err)
+	}
+	if err := checkSafe("alias", l.Alias); err != nil {
+		errs = append(errs, err)
+	}
+	for key, value := range l.ProxySetHeaders {
+		if err := checkSafe(fmt.Sprintf("proxySetHeaders[%q] key", key), key); err != nil {
+			errs = append(errs, err)
+		}
+		if err := checkSafe(fmt.Sprintf("proxySetHeaders[%q] value", key), value); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
 	if l.FastCGI.Enabled && l.FastCGI.Pass == "" {
 		errs = append(errs, errors.New("fastcgi: pass is required when fastcgi is enabled"))
 	}
+	if err := checkSafe("fastCGI.pass", l.FastCGI.Pass); err != nil {
+		errs = append(errs, err)
+	}
+	if err := checkSafe("fastCGI.index", l.FastCGI.Index); err != nil {
+		errs = append(errs, err)
+	}
+	for key, value := range l.FastCGI.Params {
+		if err := checkSafe(fmt.Sprintf("fastCGI.params[%q] key", key), key); err != nil {
+			errs = append(errs, err)
+		}
+		if err := checkSafe(fmt.Sprintf("fastCGI.params[%q] value", key), value); err != nil {
+			errs = append(errs, err)
+		}
+	}
+
 	if l.FastCGICache.Enabled {
 		if !l.FastCGI.Enabled {
 			errs = append(errs, errors.New("fastcgiCache: fastcgi must be enabled to use fastcgi caching"))
