@@ -162,6 +162,9 @@ func (s Server) Validate() error {
 			errs = append(errs, err)
 		}
 	}
+	if s.HTTP2 && !s.SSL.Enabled {
+		errs = append(errs, errors.New("http2 requires ssl to be enabled"))
+	}
 	if s.HTTP3 && !s.SSL.Enabled {
 		errs = append(errs, errors.New("http3 requires ssl to be enabled"))
 	}

@@ -16,9 +16,9 @@ var uiCmd = &cobra.Command{
 KzNginxGenerator : construction visuelle de la configuration
 (upstreams, locations, SSL, ...) avec génération et aperçu en temps réel.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		addr := fmt.Sprintf(":%d", uiPort)
+		addr := fmt.Sprintf("127.0.0.1:%d", uiPort)
 		srv := server.New(server.Options{Addr: addr, Version: Version, Revision: GitCommit})
-		if _, err := fmt.Fprintf(cmd.OutOrStdout(), "KzNginxGenerator UI disponible sur http://localhost%s\n", addr); err != nil {
+		if _, err := fmt.Fprintf(cmd.OutOrStdout(), "KzNginxGenerator UI disponible sur http://%s\n", addr); err != nil {
 			return err
 		}
 		return srv.ListenAndServe()
